@@ -3,24 +3,22 @@ import { rooms, players } from "../state";
 
 export function broadcastRooms() {
     const roomsData = Array.from(rooms.values())
-        .filter(room => room.players.length === 1) // Только комнаты с одним игроком
+        .filter(room => !room.isFull)
         .map(room => ({
             roomId: room.id,
-            roomUsers: [{
-                name: room.players[0].name,
-                index: room.players[0].id
-            }]
+            roomUsers: room.players.map(p => ({
+                name: p.name,
+                index: p.id
+            }))
         }));
-
-    const message = JSON.stringify({
-        type: 'update_room',
-        data: roomsData,
-        id: 0
-    });
 
     wss.clients.forEach(client => {
         if (client.readyState === WebSocket.OPEN) {
-            client.send(message);
+            client.send(JSON.stringify({
+                type: "update_room",
+                data: roomsData,
+                id: 0
+            }));
         }
     });
 }

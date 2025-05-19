@@ -7,11 +7,9 @@ wss.on('connection', (ws) => {
     ws.on('message', (message) => {
 
         const data = JSON.parse(message.toString());
-        data.data = JSON.parse(data.data.toString());
         handleMessage(ws, data);
     });
 
     ws.on('close', () => {
-        // Обработка отключения...
     });
 });

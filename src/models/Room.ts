@@ -1,25 +1,27 @@
 import { Player } from "./Player";
-import { Game } from "./Game";
 
 export class Room {
-    public id: string;
-    public players: Player[] = [];
-    public game: Game | null = null;
+    public readonly createdAt: number;
 
-    constructor(public creator: Player) {
-        this.id = generateId();
-        this.players.push(creator);
+    constructor(
+        public readonly id: string,
+        public players: Player[] = []
+    ) {
+        this.createdAt = Date.now();
     }
 
-    addPlayer(player: Player): boolean {
-        if (this.players.length < 2) {
-            this.players.push(player);
-            return true;
+    addPlayer(player: Player): void {
+        if (this.players.length >= 2) {
+            throw new Error("Room is full");
         }
-        return false;
+        this.players.push(player);
     }
 
-    isReady(): boolean {
+    removePlayer(playerId: string): void {
+        this.players = this.players.filter(p => p.id !== playerId);
+    }
+
+    get isFull(): boolean {
         return this.players.length === 2;
     }
 }
