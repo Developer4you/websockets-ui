@@ -17,8 +17,7 @@ export function registerRoomHandlers(
     });
 
     server.registerHandler('add_user_to_room', (ws, data: { indexRoom: string }) => {
-        const player = playerManager.getAll().find(p => p.id ===
-            /* каким-то образом определить текущего игрока */);
+        const player = playerManager.getAll().find(p => p.id === "");
         if (!player) return;
 
         const room = roomManager.joinRoom(data.indexRoom, player);

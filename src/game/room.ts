@@ -17,7 +17,18 @@ export class GameRoom {
         this.players.push(player);
     }
 
-    getPlayers() {
+    getPlayers(): Player[] {
         return [...this.players];
+    }
+
+    hasPlayer(playerId: string): boolean {
+        return this.players.some(p => p.id === playerId);
+    }
+
+    toJSON() {
+        return {
+            id: this.id,
+            players: this.players.map(p => p.toJSON())
+        };
     }
 }
