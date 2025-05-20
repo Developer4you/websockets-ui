@@ -1,15 +1,17 @@
 import { Player } from "./Player";
+import {generateId} from "../utils/idGenerator";
 
 export class Game {
-    public id: string;
+    public readonly id: string;
     public players: Player[];
-    public ships: Map<string, Ship[]> = new Map();
-    public attacks: Map<string, Set<string>> = new Map();
+    public currentPlayer: string;
 
-    constructor(public player1: Player, public player2: Player) {
+    constructor(
+        public player1: Player,
+        public player2: Player
+    ) {
         this.id = generateId();
         this.players = [player1, player2];
+        this.currentPlayer = player1.id;
     }
-
-    // Логика игры...
 }

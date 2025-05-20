@@ -1,12 +1,18 @@
+// src/models/Player.ts
 export class Player {
-    public id: string;
-    public ws: WebSocket;
-    public name: string;
-    public wins: number = 0;
+    public currentConnectionId?: string;
 
-    constructor(ws: WebSocket, name: string, id: string) {
+    constructor(
+        public readonly id: string,
+        public name: string,
+        public password: string,
+        public ws: WebSocket
+    ) {
+        this.currentConnectionId = ws.connectionId;
+    }
+
+    updateConnection(ws: WebSocket) {
         this.ws = ws;
-        this.name = name;
-        this.id = id;
+        this.currentConnectionId = ws.connectionId;
     }
 }

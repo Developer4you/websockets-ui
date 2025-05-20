@@ -1,5 +1,6 @@
 import { handleRegistration } from "./regHandler";
-import { handleCreateRoom } from "./roomHandler";
+import {handleCreateRoom, handleJoinRoom} from "./roomHandler";
+import {players} from "../state";
 
 export function handleMessage(ws: WebSocket, data: any) {
     try {
@@ -13,11 +14,33 @@ export function handleMessage(ws: WebSocket, data: any) {
                 handleCreateRoom(ws);
                 break;
 
-            // case 'add_user_to_room':
-            //     if (data.data && data.data.indexRoom && data.data.index) {
-            //         handleJoinRoom(ws, data.data.indexRoom, data.data.index);
-            //     }
-            //     break;
+            case 'add_user_to_room': {
+                try {
+                    // Парсим вложенный JSON из data
+                    const requestData = JSON.parse(data.data);
+                    const roomId = requestData.indexRoom;
+
+                    // Находим игрока по текущему соединению
+                    const player = Array.from(players.values()).find(
+                        p => p.currentConnectionId === ws.connectionId
+                    );
+                    console.log('p.currentConnectionId', player.currentConnectionId)
+                    console.log('ws.connectionId', ws.connectionId)
+
+                    if (!player) {
+                        throw new Error('Сначала пройдите регистрацию');
+                    }
+
+                    handleJoinRoom(ws, roomId, player.id);
+                } catch (error) {
+                    ws.send(JSON.stringify({
+                        type: 'error',
+                        data: JSON.stringify({ errorText: error.message }),
+                        id: 0
+                    }));
+                }
+                break;
+            }
 
             default:
                 throw new Error('Unknown message type');

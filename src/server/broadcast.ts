@@ -2,7 +2,7 @@ import { wss } from "./websocket";
 import { rooms, players } from "../state";
 
 export function broadcastRooms() {
-    const roomsData = Array.from(rooms.values())
+    const roomsData = JSON.stringify(Array.from(rooms.values())
         .filter(room => !room.isFull)
         .map(room => ({
             roomId: room.id,
@@ -10,7 +10,7 @@ export function broadcastRooms() {
                 name: p.name,
                 index: p.id
             }))
-        }));
+        })));
 
     wss.clients.forEach(client => {
         if (client.readyState === WebSocket.OPEN) {
