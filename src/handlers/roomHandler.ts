@@ -1,5 +1,5 @@
 import { Room } from "../models/Room";
-import { players, rooms } from "../state";
+import {games, players, rooms} from "../state";
 import { generateId } from "../utils/idGenerator";
 import { broadcastRooms } from "../server/broadcast";
 import {Game} from "../models/Game";
@@ -8,9 +8,6 @@ export function handleCreateRoom(ws: WebSocket) {
     try {
         const player = Array.from(players.values()).find(
             p => {
-                console.log('p.currentConnectionId', p.currentConnectionId)
-                console.log('ws.connectionId', ws.connectionId)
-
                 return p.currentConnectionId === ws.connectionId
             }
         );
@@ -39,8 +36,13 @@ export function handleCreateRoom(ws: WebSocket) {
 
 export function handleJoinRoom(ws: WebSocket, roomId: string, playerId: string) {
     try {
+        console.log('Урааааа')
         const room = rooms.get(roomId);
         const player = players.get(playerId);
+
+        if (!player) {
+            throw new Error("Игрок не найден");
+        }
 
         // Проверка существования комнаты и игрока
         if (!room || !player) {
@@ -65,9 +67,16 @@ export function handleJoinRoom(ws: WebSocket, roomId: string, playerId: string) 
 
         // Создание игры при заполнении
         if (room.players.length === 2) {
-            const game = new Game(room.players[0], room.players[1]);
-            activeGames.set(game.id, game);
+            // Проверка наличия обоих игроков
+            if (room.players.some(p => !p)) {
+                throw new Error("Не удалось создать игру: отсутствуют игроки");
+            }
 
+            // Передаём массив игроков
+            const game = new Game(generateId(), room.players);
+            console.log('2')
+            games.set(game.id, game);
+            console.log('3')
             // Отправка уведомлений игрокам
             room.players.forEach(player => {
                 player.ws.send(JSON.stringify({

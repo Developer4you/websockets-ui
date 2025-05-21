@@ -1,6 +1,7 @@
 import { handleRegistration } from "./regHandler";
 import {handleCreateRoom, handleJoinRoom} from "./roomHandler";
 import {players} from "../state";
+import {handleAddShips} from "./shipHandler";
 
 export function handleMessage(ws: WebSocket, data: any) {
     try {
@@ -24,8 +25,6 @@ export function handleMessage(ws: WebSocket, data: any) {
                     const player = Array.from(players.values()).find(
                         p => p.currentConnectionId === ws.connectionId
                     );
-                    console.log('p.currentConnectionId', player.currentConnectionId)
-                    console.log('ws.connectionId', ws.connectionId)
 
                     if (!player) {
                         throw new Error('Сначала пройдите регистрацию');
@@ -36,6 +35,24 @@ export function handleMessage(ws: WebSocket, data: any) {
                     ws.send(JSON.stringify({
                         type: 'error',
                         data: JSON.stringify({ errorText: error.message }),
+                        id: 0
+                    }));
+                }
+                break;
+            }
+
+            case 'add_ships': {
+                try {
+                    const requestData = JSON.parse(data.data);
+                    handleAddShips(
+                        requestData.gameId,
+                        requestData.indexPlayer,
+                        requestData.ships
+                    );
+                } catch (error) {
+                    ws.send(JSON.stringify({
+                        type: 'error',
+                        data: { errorText: error.message },
                         id: 0
                     }));
                 }

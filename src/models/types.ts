@@ -1,3 +1,5 @@
+import {Player} from "./Player";
+
 export type Direction = 'horizontal' | 'vertical';
 export type ShipType = 'small' | 'medium' | 'large' | 'huge';
 
@@ -15,7 +17,7 @@ export interface Ship {
 }
 
 export interface GameState {
-    players: string[];
+    players: Player[];
     currentPlayer: string;
     ships: Record<string, Ship[]>;
     attacks: Record<string, Position[]>;
