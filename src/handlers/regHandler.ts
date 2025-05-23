@@ -21,7 +21,7 @@ export function handleRegistration(ws: WebSocket, data: DataType) {
             if (player.password !== password) throw new Error('Invalid password');
             player.updateConnection(ws); // Обновляем соединение
         } else {
-            player = new Player(generateId(), name, password, ws);
+            player = new Player(generateId(), name, password, ws, 0);
             players.set(player.id, player);
         }
 

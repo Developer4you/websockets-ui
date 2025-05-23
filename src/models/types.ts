@@ -1,6 +1,5 @@
 import {Player} from "./Player";
 
-export type Direction = 'horizontal' | 'vertical';
 export type ShipType = 'small' | 'medium' | 'large' | 'huge';
 
 export interface Position {
@@ -10,7 +9,7 @@ export interface Position {
 
 export interface Ship {
     position: Position;
-    direction: Direction;
+    direction: boolean;
     length: number;
     type: ShipType;
     hits?: number;
@@ -21,4 +20,9 @@ export interface GameState {
     currentPlayer: string;
     ships: Record<string, Ship[]>;
     attacks: Record<string, Position[]>;
+}
+
+export interface AttackResult {
+    position: Position;
+    status: string;
 }

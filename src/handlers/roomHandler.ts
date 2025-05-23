@@ -36,7 +36,6 @@ export function handleCreateRoom(ws: WebSocket) {
 
 export function handleJoinRoom(ws: WebSocket, roomId: string, playerId: string) {
     try {
-        console.log('Урааааа')
         const room = rooms.get(roomId);
         const player = players.get(playerId);
 
@@ -74,9 +73,7 @@ export function handleJoinRoom(ws: WebSocket, roomId: string, playerId: string) 
 
             // Передаём массив игроков
             const game = new Game(generateId(), room.players);
-            console.log('2')
             games.set(game.id, game);
-            console.log('3')
             // Отправка уведомлений игрокам
             room.players.forEach(player => {
                 player.ws.send(JSON.stringify({

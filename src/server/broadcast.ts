@@ -1,8 +1,10 @@
 import { wss } from "./websocket";
 import { rooms, players } from "../state";
+import {Game} from "../models/Game";
+import {AttackResult} from "../models/types";
 
 export function broadcastRooms() {
-    console.log('broadcastRooms')
+
     const roomsData = JSON.stringify(Array.from(rooms.values())
         .filter(room => !room.isFull)
         .map(room => ({
@@ -25,6 +27,7 @@ export function broadcastRooms() {
 }
 
 export function broadcastWinners() {
+
     const winners = Array.from(players.values()).map(p => JSON.stringify({
         name: p.name,
         wins: p.wins
@@ -43,31 +46,58 @@ export function broadcastWinners() {
     });
 }
 
-export function broadcastStartGame(game: Game) {
-    // Для каждого игрока в игре
-    game.getPlayers().forEach(player => {
-        if (!player.ws || player.ws.readyState !== WebSocket.OPEN) return;
 
-        // Формируем данные для конкретного игрока
-        const response = {
-            type: "start_game" as const,
-            data: {
-                ships: game.ships[player.id].map(ship => ({
-                    position: ship.position,
-                    direction: ship.direction === 'horizontal', // Конвертируем обратно в boolean
-                    length: ship.length,
-                    type: ship.type
-                })),
-                currentPlayerIndex: game.currentPlayer
-            },
-            id: 0
-        };
+export function broadcastAttack(game: Game, result: AttackResult) {
 
-        // Двойная сериализация для совместимости с фронтендом
-        const stringifiedData = JSON.stringify(response.data);
-        player.ws.send(JSON.stringify({
-            ...response,
-            data: stringifiedData
-        }));
+    const message = {
+        type: "attack",
+        data: JSON.stringify({
+            position: result.position,
+            currentPlayer: game.currentPlayer,
+            status: result.status
+        }),
+        id: 0
+    };
+
+    game.players.forEach(player => {
+        if (player.ws.readyState === WebSocket.OPEN) {
+            player.ws.send(JSON.stringify(message));
+        }
+    });
+}
+
+
+export function broadcastTurn(game: Game) {
+
+    const message = {
+        type: "turn",
+        data: JSON.stringify({
+            currentPlayer: game.currentPlayer
+        }),
+        id: 0
+    };
+
+    game.players.forEach(player => {
+        if (player.ws.readyState === WebSocket.OPEN) {
+            player.ws.send(JSON.stringify(message));
+        }
+    });
+}
+
+
+export function broadcastFinish(game: Game, winnerId: string) {
+
+    const message = {
+        type: "finish",
+        data: JSON.stringify({
+            winPlayer: winnerId
+        }),
+        id: 0
+    };
+
+    game.players.forEach(player => {
+        if (player.ws.readyState === WebSocket.OPEN) {
+            player.ws.send(JSON.stringify(message));
+        }
     });
 }

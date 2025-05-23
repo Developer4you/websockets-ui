@@ -2,6 +2,7 @@ import { handleRegistration } from "./regHandler";
 import {handleCreateRoom, handleJoinRoom} from "./roomHandler";
 import {players} from "../state";
 import {handleAddShips} from "./shipHandler";
+import {handleAttack, handleRandomAttack} from "./gameHandler";
 
 export function handleMessage(ws: WebSocket, data: any) {
     try {
@@ -56,6 +57,18 @@ export function handleMessage(ws: WebSocket, data: any) {
                         id: 0
                     }));
                 }
+                break;
+            }
+
+            case 'attack': {
+                const { gameId, x, y, indexPlayer } = JSON.parse(data.data);
+                handleAttack(gameId, indexPlayer, { x, y });
+                break;
+            }
+
+            case 'randomAttack': {
+                const { gameId, indexPlayer } = JSON.parse(data.data);
+                handleRandomAttack(gameId, indexPlayer);
                 break;
             }
 

@@ -6,7 +6,8 @@ export class Player {
         public readonly id: string,
         public name: string,
         public password: string,
-        public ws: WebSocket
+        public ws: WebSocket,
+        public wins: number
     ) {
         this.currentConnectionId = ws.connectionId;
     }
