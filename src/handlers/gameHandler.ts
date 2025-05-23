@@ -1,5 +1,5 @@
-import { broadcastAttack, broadcastTurn, broadcastFinish } from "../server/broadcast";
-import {games} from "../state";
+import {broadcastAttack, broadcastFinish, broadcastWinners} from "../server/broadcast";
+import {games, players} from "../state";
 import {Position} from "../models/types";
 
 export function handleAttack(
@@ -18,7 +18,11 @@ export function handleAttack(
             if (result.status === "killed") {
                 const winner = game.checkWinner();
                 if (winner) {
+                    const player = Array.from(players.values())
+                        .find(p=>p.id===playerId);
+                    player.wins++;
                     broadcastFinish(game, playerId);
+                    broadcastWinners();
                     games.delete(game.id);
                 }
             }
